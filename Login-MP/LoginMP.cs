@@ -8,22 +8,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace LogIn200
+namespace Login_MP
 {
-    public partial class LoginForm : Form
+    public partial class LoginMP : Form
     {
-        /// <summary>
-        /// The reference to the controller object, later
-        /// we need to replace this with delegate(s).
-        /// </summary>
-        Controller controller;
+        InputHandler inHandler;
 
-        public LoginForm()
+        public LoginMP(InputHandler ih)
         {
             InitializeComponent();
-           
+            this.inHandler = ih;
         }
 
+        /// <summary>
+        /// Listener to the Login button. It takes the user's input
+        /// for the username and password and pass the values to the
+        /// Controller along with the state the view is in.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void uxLoginBtn_Click(object sender, EventArgs e)
+        {
+            String un = tbUserName.Text;
+            String up = tbPassword.Text;
+            Console.WriteLine(un + " " + up);
+            inHandler(State.GOTPASSWORD, un + ":" + up);
+        }
         /// <summary>
         /// THis method keepts the GUI controlls enabled/disabled, displaying the
         /// right information based on the App's satate.
@@ -59,32 +69,6 @@ namespace LogIn200
 
             }
         }
-
-        /// <summary>
-        /// Listener to the Login button. It takes the user's input
-        /// for the username and password and pass the values to the
-        /// Controller along with the state the view is in.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UxLoginBtn_Click(object sender, EventArgs e)
-        {
-            String un = tbUserName.Text;
-            String up = tbPassword.Text;
-            Console.WriteLine(un + " " +up);
-            controller.handleEvents(State.GOTPASSWORD, un+":"+up);
-        }
-
-        /// <summary>
-        /// Links the View to the controller.
-        /// </summary>
-        /// <param name="c">The App's main controller object. Later
-        /// this shold be a delegate.</param>
-        public void SetController(Controller c)
-        {
-            controller = c;
-        }
-
         /// <summary>
         /// TO synch the View and the Controller objects.
         /// </summary>
@@ -92,7 +76,7 @@ namespace LogIn200
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-            controller.handleEvents(State.START, "");
+            inHandler(State.START, "");
         }
 
         /// <summary>
@@ -103,9 +87,8 @@ namespace LogIn200
         /// <param name="e"></param>
         private void tbUserName_TextChanged(object sender, EventArgs e)
         {
-            controller.handleEvents(State.GOTUSERNAME, "");
+            inHandler(State.GOTUSERNAME, "");
         }
-
 
         /// <summary>
         /// This method helps avoid some user input propblems, and helps
@@ -117,6 +100,5 @@ namespace LogIn200
         {
             uxLoginBtn.Enabled = true;
         }
-
     }
 }
